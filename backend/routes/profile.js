@@ -1,8 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const jwt = require('jsonwebtoken');
-const User = require('../../models/User');
-const Review = require('../../models/Review');
+const User = require('../models/User');
+const Review = require('../models/Review');
 
 // Middleware to verify JWT
 function authMiddleware(req, res, next) {

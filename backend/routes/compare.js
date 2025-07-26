@@ -1,8 +1,8 @@
 const express = require('express');
 const router = express.Router();
-const Product = require('../../models/Product');
-const User = require('../../models/User');
-const Review = require('../../models/Review');
+const Product = require('../models/Product');
+const User = require('../models/User');
+const Review = require('../models/Review');
 
 // Mock mandi prices
 const mandiPrices = {
