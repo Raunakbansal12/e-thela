@@ -108,6 +108,7 @@
     }
 
     // Supplier Product CRUD
+    let editingProductId = null;
     async function loadProducts() {
       const res = await fetch('http://localhost:5000/products/mine', { headers: { 'Authorization': 'Bearer ' + token } });
       const products = await res.json();
@@ -121,7 +122,7 @@
             <td>${prod.unit}</td>
             <td>${prod.image ? `<img src="${prod.image}" width="40">` : ''}</td>
             <td>
-              <button class="btn btn-sm btn-warning" onclick="editProduct('${prod._id}')">Edit</button>
+              <button class="btn btn-sm btn-warning" onclick="editProduct('${prod._id}', '${prod.name}', '${prod.price}', '${prod.unit}', '${prod.image || ''}')">Edit</button>
               <button class="btn btn-sm btn-danger" onclick="deleteProduct('${prod._id}')">Delete</button>
             </td>
           </tr>
@@ -134,16 +135,34 @@
       const price = document.getElementById('prodPrice').value;
       const unit = document.getElementById('prodUnit').value;
       const image = document.getElementById('prodImage').value;
-      const res = await fetch('http://localhost:5000/products', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
-        body: JSON.stringify({ name, price, unit, image })
-      });
-      if (res.ok) {
-        document.getElementById('productForm').reset();
-        loadProducts();
+      if (editingProductId) {
+        // Edit mode
+        const res = await fetch(`http://localhost:5000/products/${editingProductId}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+          body: JSON.stringify({ name, price, unit, image })
+        });
+        if (res.ok) {
+          editingProductId = null;
+          document.getElementById('productForm').reset();
+          document.querySelector('#productForm button[type=submit]').innerText = 'Add Product';
+          loadProducts();
+        } else {
+          alert('Failed to update product');
+        }
       } else {
-        alert('Failed to add product');
+        // Add mode
+        const res = await fetch('http://localhost:5000/products', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+          body: JSON.stringify({ name, price, unit, image })
+        });
+        if (res.ok) {
+          document.getElementById('productForm').reset();
+          loadProducts();
+        } else {
+          alert('Failed to add product');
+        }
       }
     }
     window.deleteProduct = async function(id) {
@@ -155,11 +174,17 @@
       if (res.ok) loadProducts();
       else alert('Failed to delete');
     }
-    window.editProduct = function(id) {
-      alert('Edit functionality coming soon!');
+    window.editProduct = function(id, name, price, unit, image) {
+      editingProductId = id;
+      document.getElementById('prodName').value = name;
+      document.getElementById('prodPrice').value = price;
+      document.getElementById('prodUnit').value = unit;
+      document.getElementById('prodImage').value = image;
+      document.querySelector('#productForm button[type=submit]').innerText = 'Update Product';
     }
 
     // Vendor Listing CRUD
+    let editingListingId = null;
     async function loadListings() {
       const res = await fetch('http://localhost:5000/listings/mine', { headers: { 'Authorization': 'Bearer ' + token } });
       const listings = await res.json();
@@ -173,7 +198,7 @@
             <td>${list.image ? `<img src="${list.image}" width="40">` : ''}</td>
             <td>${list.description || ''}</td>
             <td>
-              <button class="btn btn-sm btn-warning" onclick="editListing('${list._id}')">Edit</button>
+              <button class="btn btn-sm btn-warning" onclick="editListing('${list._id}', '${list.title}', '${list.price}', '${list.image || ''}', '${list.description || ''}')">Edit</button>
               <button class="btn btn-sm btn-danger" onclick="deleteListing('${list._id}')">Delete</button>
             </td>
           </tr>
@@ -186,16 +211,34 @@
       const price = document.getElementById('listPrice').value;
       const image = document.getElementById('listImage').value;
       const description = document.getElementById('listDesc').value;
-      const res = await fetch('http://localhost:5000/listings', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
-        body: JSON.stringify({ title, price, image, description })
-      });
-      if (res.ok) {
-        document.getElementById('listingForm').reset();
-        loadListings();
+      if (editingListingId) {
+        // Edit mode
+        const res = await fetch(`http://localhost:5000/listings/${editingListingId}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+          body: JSON.stringify({ title, price, image, description })
+        });
+        if (res.ok) {
+          editingListingId = null;
+          document.getElementById('listingForm').reset();
+          document.querySelector('#listingForm button[type=submit]').innerText = 'Add Listing';
+          loadListings();
+        } else {
+          alert('Failed to update listing');
+        }
       } else {
-        alert('Failed to add listing');
+        // Add mode
+        const res = await fetch('http://localhost:5000/listings', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+          body: JSON.stringify({ title, price, image, description })
+        });
+        if (res.ok) {
+          document.getElementById('listingForm').reset();
+          loadListings();
+        } else {
+          alert('Failed to add listing');
+        }
       }
     }
     window.deleteListing = async function(id) {
@@ -207,8 +250,13 @@
       if (res.ok) loadListings();
       else alert('Failed to delete');
     }
-    window.editListing = function(id) {
-      alert('Edit functionality coming soon!');
+    window.editListing = function(id, title, price, image, description) {
+      editingListingId = id;
+      document.getElementById('listTitle').value = title;
+      document.getElementById('listPrice').value = price;
+      document.getElementById('listImage').value = image;
+      document.getElementById('listDesc').value = description;
+      document.querySelector('#listingForm button[type=submit]').innerText = 'Update Listing';
     }
 
     async function loadMyReviews() {
