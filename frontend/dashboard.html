@@ -28,6 +28,7 @@
         <div class="mt-3 text-center">
           <a href="marketplace.html" class="btn btn-success">Go to Marketplace</a>
         </div>
+        <div id="reviewsSection" class="mt-4"></div>
       </div>
     </div>
   </div>
@@ -56,6 +57,7 @@
             <p class="card-text">Average Rating: <span class="fw-bold">${data.avgRating ?? 'N/A'}</span> (${data.reviewCount} reviews)</p>
           `;
           renderManagementSection();
+          loadMyReviews();
         } else {
           alert(data.message || 'Failed to load profile');
         }
@@ -207,6 +209,35 @@
     }
     window.editListing = function(id) {
       alert('Edit functionality coming soon!');
+    }
+
+    async function loadMyReviews() {
+      const res = await fetch(`http://localhost:5000/reviews/${userId}`);
+      const reviews = await res.json();
+      const section = document.getElementById('reviewsSection');
+      if (reviews.length) {
+        section.innerHTML = `
+          <div class="card mt-4">
+            <div class="card-header"><strong>Received Reviews</strong></div>
+            <ul class="list-group list-group-flush">
+              ${reviews.map(r => `
+                <li class="list-group-item">
+                  <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                      <strong>${r.authorId?.fullName || 'User'}</strong> <span class="badge bg-secondary">${r.authorId?.role || ''}</span>
+                    </div>
+                    <div>${'★'.repeat(r.rating)}${'☆'.repeat(5 - r.rating)}</div>
+                  </div>
+                  <div>${r.comment || ''}</div>
+                  <div class="text-muted small">${new Date(r.createdAt).toLocaleString()}</div>
+                </li>
+              `).join('')}
+            </ul>
+          </div>
+        `;
+      } else {
+        section.innerHTML = '';
+      }
     }
   </script>
 </body>
