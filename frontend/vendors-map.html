@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>e-ठेला | Rajasthan Vendor Map</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+Bhai+2:wght@700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      background: #fff8f0 url('https://www.transparenttextures.com/patterns/arabesque.png');
+      font-family: 'Poppins', 'Baloo Bhai 2', cursive, sans-serif;
+    }
+    .rajasthan-banner {
+      background: linear-gradient(90deg, #ff9800 0%, #e65100 100%);
+      color: #fff;
+      font-family: 'Baloo Bhai 2', cursive;
+      font-size: 2rem;
+      letter-spacing: 2px;
+      text-align: center;
+      padding: 1rem 0;
+      box-shadow: 0 4px 12px rgba(230,81,0,0.15);
+      border-bottom: 4px solid #ffd54f;
+      background-image: url('https://img.icons8.com/color/48/000000/camel--v2.png');
+      background-repeat: no-repeat;
+      background-position: 1rem center;
+    }
+    .leaflet-container {
+      height: 70vh;
+      border-radius: 1rem;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+      margin-bottom: 2rem;
+    }
+    .vendor-popup {
+      min-width: 220px;
+    }
+    .vendor-popup .card {
+      border: none;
+      box-shadow: 0 2px 8px rgba(255,152,0,0.15);
+    }
+    .vendor-popup .card-title {
+      font-family: 'Baloo Bhai 2', cursive;
+      color: #e65100;
+    }
+  </style>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+</head>
+<body>
+  <div class="rajasthan-banner">
+    <img src="https://img.icons8.com/color/48/000000/camel--v2.png" style="height:2.5rem;vertical-align:middle;margin-right:1rem;">
+    Welcome to Rajasthan’s e-ठेला!
+    <img src="https://img.icons8.com/color/48/000000/camel--v2.png" style="height:2.5rem;vertical-align:middle;margin-left:1rem;">
+  </div>
+  <nav class="navbar navbar-expand-lg navbar-light" style="background:#ffd54f;">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="index.html" style="font-family:'Baloo Bhai 2',cursive;color:#e65100;font-size:1.5rem;">e-ठेला</a>
+      <div class="d-flex">
+        <a href="dashboard.html" class="btn btn-outline-primary me-2">Dashboard</a>
+        <a href="marketplace.html" class="btn btn-success me-2">Marketplace</a>
+        <a href="index.html" class="btn btn-outline-secondary" onclick="localStorage.removeItem('token')">Logout</a>
+      </div>
+    </div>
+  </nav>
+  <div class="container mt-4">
+    <h2 class="mb-4" style="font-family:'Baloo Bhai 2',cursive;color:#e65100;">Find Street Vendors Near You</h2>
+    <div id="map" class="mb-4"></div>
+    <div class="alert alert-warning">Note: Vendor locations are randomly generated for demo purposes.</div>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <script>
+    // Jaipur center for demo
+    const jaipur = [26.9124, 75.7873];
+    const map = L.map('map').setView(jaipur, 12);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap contributors'
+    }).addTo(map);
+    // Fetch all listings (vendors)
+    fetch('http://localhost:5000/listings')
+      .then(res => res.json())
+      .then(listings => {
+        listings.forEach(list => {
+          // Randomize vendor location near Jaipur for demo
+          const lat = jaipur[0] + (Math.random() - 0.5) * 0.1;
+          const lng = jaipur[1] + (Math.random() - 0.5) * 0.1;
+          const marker = L.marker([lat, lng]).addTo(map);
+          marker.bindPopup(`
+            <div class='vendor-popup'>
+              <div class='card'>
+                ${list.image ? `<img src='${list.image}' class='card-img-top' style='max-height:100px;object-fit:cover;'>` : ''}
+                <div class='card-body'>
+                  <h5 class='card-title'>${list.title}</h5>
+                  <p class='card-text mb-1'><strong>Price:</strong> ₹${list.price}</p>
+                  <p class='card-text mb-1'><strong>Vendor:</strong> ${list.vendorId?.fullName || 'N/A'}</p>
+                  <button class='btn btn-outline-primary btn-sm w-100 mb-1' onclick='alert("Connecting you to the vendor privately...")'>Call Vendor</button>
+                  <button class='btn btn-outline-success btn-sm w-100' onclick='openReviewsListModal("${list.vendorId?._id}", "${list.vendorId?.fullName}")'>View Reviews</button>
+                </div>
+              </div>
+            </div>
+          `);
+        });
+      });
+    // Reviews modal (reuse from marketplace)
+    window.openReviewsListModal = async function(userId, userName) {
+      if (!window.reviewsModalDiv) {
+        reviewsModalDiv = document.createElement('div');
+        reviewsModalDiv.innerHTML = `
+          <div class='modal fade' id='reviewsListModal' tabindex='-1' aria-labelledby='reviewsListModalLabel' aria-hidden='true'>
+            <div class='modal-dialog modal-lg'>
+              <div class='modal-content'>
+                <div class='modal-header'>
+                  <h5 class='modal-title' id='reviewsListModalLabel'>User Reviews</h5>
+                  <button type='button' class='btn-close' data-bs-dismiss='modal' aria-label='Close'></button>
+                </div>
+                <div class='modal-body' id='reviewsListBody'></div>
+              </div>
+            </div>
+          </div>`;
+        document.body.appendChild(reviewsModalDiv);
+      }
+      document.getElementById('reviewsListModalLabel').innerText = `Reviews for ${userName}`;
+      const res = await fetch(`http://localhost:5000/reviews/${userId}`);
+      const reviews = await res.json();
+      const body = document.getElementById('reviewsListBody');
+      if (reviews.length) {
+        body.innerHTML = `<ul class='list-group'>
+          ${reviews.map(r => `
+            <li class='list-group-item'>
+              <div class='d-flex justify-content-between align-items-center'>
+                <div>
+                  <strong>${r.authorId?.fullName || 'User'}</strong> <span class='badge bg-secondary'>${r.authorId?.role || ''}</span>
+                </div>
+                <div>${'★'.repeat(r.rating)}${'☆'.repeat(5 - r.rating)}</div>
+              </div>
+              <div>${r.comment || ''}</div>
+              <div class='text-muted small'>${new Date(r.createdAt).toLocaleString()}</div>
+            </li>
+          `).join('')}</ul>`;
+      } else {
+        body.innerHTML = '<div class="alert alert-info">No reviews yet.</div>';
+      }
+      var reviewsModal = new bootstrap.Modal(document.getElementById('reviewsListModal'));
+      reviewsModal.show();
+    }
+  </script>
+</body>
+</html> 
