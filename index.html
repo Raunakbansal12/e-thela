@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>e-ठेला | Home</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+Bhai+2:wght@700&display=swap" rel="stylesheet"/>
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+    }
+
+    main {
+      flex: 1;
+    }
+
+    body {
+      background: #fff8f0 url('https://www.transparenttextures.com/patterns/arabesque.png');
+      font-family: 'Poppins', 'Baloo Bhai 2', cursive, sans-serif;
+    }
+
+    .rajasthan-banner {
+      background: linear-gradient(90deg, #ff9800 0%, #e65100 100%);
+      color: #0f0f0f;
+      font-family: 'Baloo Bhai 2', cursive;
+      font-size: 2rem;
+      letter-spacing: 2px;
+      text-align: center;
+      padding: 1rem 0;
+      box-shadow: 0 4px 12px rgba(230,81,0,0.15);
+      border-bottom: 4px solid #ffd54f;
+      background-image: url('https://img.icons8.com/color/48/000000/camel--v2.png');
+      background-repeat: no-repeat;
+      background-position: 1rem center;
+    }
+
+    .rajasthan-banner img {
+      height: 2.5rem;
+      vertical-align: middle;
+      margin: 0 1rem;
+    }
+
+    .navbar {
+      background: #ffd54f !important;
+    }
+
+    .navbar-brand {
+      font-family: 'Baloo Bhai 2', cursive;
+      color: #e65100 !important;
+      font-size: 1.5rem;
+    }
+
+    .card {
+      border: none;
+      box-shadow: 0 4px 24px rgba(255,152,0,0.08);
+    }
+
+    .btn-primary, .btn-success {
+      background: linear-gradient(90deg, #ff9800 0%, #e65100 100%);
+      border: none;
+    }
+
+    .btn-primary:hover, .btn-success:hover {
+      background: linear-gradient(90deg, #e65100 0%, #ff9800 100%);
+    }
+  </style>
+</head>
+<body>
+
+  <main>
+    <div class="rajasthan-banner">
+      <img src="https://unpkg.com/openmoji@14.0.0/color/svg/1F42A.svg" alt="Camel Icon">
+      Welcome to Rajasthan’s e-ठेला!
+      <img src="https://unpkg.com/openmoji@14.0.0/color/svg/1F42A.svg" alt="Camel Icon">
+    </div>
+
+    <div id="greeting" style="margin-top: 1rem; font-size: 1.2rem; font-weight: 500;"></div>
+
+    <nav class="navbar navbar-expand-lg navbar-light">
+      <div class="container-fluid">
+        <a class="navbar-brand" href="#">e-ठेला</a>
+        <div class="d-flex">
+          <a href="login.html" class="btn btn-outline-primary me-2">Login</a>
+          <a href="register.html" class="btn btn-primary">Register</a>
+          <a href="marketplace.html" class="btn btn-success ms-2">Marketplace</a>
+          <a href="vendors-map.html" class="btn btn-warning ms-2">Vendors Map</a>
+        </div>
+      </div>
+    </nav>
+
+    <div class="container mt-5">
+      <div class="row justify-content-center">
+        <div class="col-md-8">
+          <div class="card text-center">
+            <div class="card-body">
+              <h1 class="card-title display-4">Welcome to e-ठेला</h1>
+              <p class="card-text lead">Your digital assistant for Indian street vendors. Simple. Accessible. Powerful.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="text-center mt-5">
+      <a href="register.html" class="btn btn-lg btn-warning px-5 py-3" style="font-size: 1.25rem;">🚀 Start Your Journey</a>
+    </div>
+
+    <!-- Trending Vendors -->
+    <div class="container my-4">
+      <h3 class="text-center">🌟 Trending Vendors</h3>
+      <div class="row">
+        <div class="col-md-4"><div class="card p-3 shadow-sm">🍅 Jaipur Fresh Veggies</div></div>
+        <div class="col-md-4"><div class="card p-3 shadow-sm">🥔 Udaipur Potato King</div></div>
+        <div class="col-md-4"><div class="card p-3 shadow-sm">🌽 Kota Grain Bazar</div></div>
+      </div>
+    </div>
+
+    <!-- Info Section -->
+    <div class="container">
+      <div class="row text-center">
+        <h2 class="mb-4">How e-ठेला helps you?</h2>
+        <div class="col-md-4 mb-4">
+          <div class="card h-100 shadow-sm">
+            <div class="card-body">
+              <h5 class="card-title">🧺 For Vendors</h5>
+              <p class="card-text">Easily find and compare raw materials. Connect with trusted suppliers near you.</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4 mb-4">
+          <div class="card h-100 shadow-sm">
+            <div class="card-body">
+              <h5 class="card-title">🏗 For Suppliers</h5>
+              <p class="card-text">List your products and get direct orders from local vendors across Rajasthan.</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4 mb-4">
+          <div class="card h-100 shadow-sm">
+            <div class="card-body">
+              <h5 class="card-title">🤖 AI Assistant</h5>
+              <p class="card-text">Ask anything! Our chatbot helps with registration, vendor lookup, and supplier search.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="container my-5 text-center">
+        <h4>📊 e-ठेला at a Glance</h4>
+        <div class="row mt-3">
+          <div class="col"><h1>750+</h1><p>Registered Vendors</p></div>
+          <div class="col"><h1>120+</h1><p>Trusted Suppliers</p></div>
+          <div class="col"><h1>10+</h1><p>Rajasthan Cities Covered</p></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Search Result Section -->
+    <div id="searchResult" class="mt-4"></div>
+  </main>
+
+  <!-- Footer -->
+  <footer style="background-color: #000; color: white; padding: 3rem 1rem;">
+    <div class="container">
+      <div class="row text-center text-md-start">
+        <div class="col-md-4 mb-6">
+          <img src="images.png" alt="Contact us" style="height: 35px;">
+          <ul>
+            <li><p>Email: <a href="mailto:support@ethela.in">support@ethela.in</a></p></li>
+            <li><p>Phone: <a href="tel:+917210000727">(+91) 7210000727</a></p></li>
+            <li><p>Location: Rajasthan, India</p></li>
+          </ul>
+        </div>
+        <div class="col-md-4 mb-4">
+          <h5>Quick links</h5>
+          <ul class="list-unstyled">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="register.html">Register</a></li>
+            <li><a href="marketplace.html">Marketplace</a></li>
+            <li><a href="vendors-map.html">Locate a Vendor</a></li>
+          </ul>
+        </div>
+        <div class="col-md-4 mb-4">
+          <h5>ABOUT</h5>
+          <p>e-ठेला is a digital platform that connects street vendors with raw material suppliers. Vendors can browse, compare, and purchase supplies directly from trusted suppliers—making their daily operations simpler, cheaper, and faster.</p>
+        </div>
+      </div>
+      <div class="text-center mt-4">
+        <p class="small" style="color: blanchedalmond;">© 2025 e-ठेला | All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+  <!-- Greeting Script -->
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const now = new Date();
+      const hours = now.getHours();
+      const mins = now.getMinutes().toString().padStart(2, '0');
+
+      let greeting = "Hello";
+      if (hours < 12) greeting = "Good Morning";
+      else if (hours < 18) greeting = "Good Afternoon";
+      else greeting = "Good Evening";
+
+      document.getElementById("greeting").innerText =
+        ${greeting}! ⏰ It's ${hours}:${mins};
+    });
+  </script>
+  <!-- Chatbot Button -->
+<div id="chatbot-button" style="position: fixed; bottom: 20px; right: 20px; z-index: 999;">
+  <button onclick="toggleChatbot()" style="background-color: #ff9800; border: none; color: white; padding: 0.7rem 1rem; border-radius: 30px; font-weight: bold;">💬 Chat</button>
+</div>
+
+<!-- Chatbot Box -->
+<div id="chatbot-box" style="display: none; position: fixed; bottom: 80px; right: 20px; width: 320px; background: white; border: 1px solid #ccc; border-radius: 10px; box-shadow: 0 0 15px rgba(0,0,0,0.2); z-index: 999;">
+  <div style="background-color: #ff9800; padding: 10px; color: white; border-top-left-radius: 10px; border-top-right-radius: 10px; font-weight: bold;">
+    e-ठेला Support Bot
+  </div>
+  <div id="chat-content" style="padding: 10px; height: 240px; overflow-y: auto; font-size: 0.9rem; background-color: #fdf7ee;">
+    <div class="bot-msg" style="margin-bottom: 10px; background: #ffe0b2; padding: 8px 12px; border-radius: 12px; display: inline-block;">👋 Hello! How can I help you today?</div>
+  </div>
+  <div style="display: flex; border-top: 1px solid #eee;">
+    <input id="user-input" type="text" placeholder="Type a message..." style="flex: 1; border: none; padding: 10px;">
+    <button onclick="sendMessage()" style="background: #e65100; border: none; color: white; padding: 0 16px;">Send</button>
+  </div>
+</div>
+
+
+<script>
+  const responses = {
+    hello: "Hi there! How can I assist you today?",
+    hi: "Hello! 😊 What would you like to know?",
+    registration: "To register, click on the 'Register' button at the top of the homepage.",
+    register: "To register, click on the 'Register' button above.",
+    vendor: "Vendors can use the 'Marketplace' or 'Vendors Map' to find suppliers.",
+    supplier: "Suppliers can list raw materials on the Marketplace. Vendors will contact them directly.",
+    contact: "📧 Email: support@ethela.in<br>📞 Phone: +91-7210000727",
+    thanks: "You're welcome! 😊",
+    bye: "Goodbye! Have a great day!",
+    default: "I'm not sure about that 🤔. You can ask about registration, vendors, or contact info."
+  };
+
+  function toggleChatbot() {
+    const box = document.getElementById('chatbot-box');
+    box.style.display = box.style.display === 'none' ? 'block' : 'none';
+  }
+
+  function sendMessage() {
+    const input = document.getElementById('user-input');
+    const chat = document.getElementById('chat-content');
+    const userMsg = input.value.trim();
+    if (!userMsg) return;
+
+    // Add user message
+    const userDiv = document.createElement('div');
+    userDiv.className = 'user-msg';
+    userDiv.style = "text-align: right; margin: 8px 0;";
+    userDiv.innerHTML = <span style="background: #dcedc8; padding: 8px 12px; border-radius: 12px; display: inline-block;">${userMsg}</span>;
+    chat.appendChild(userDiv);
+
+    // Bot reply
+    const key = Object.keys(responses).find(k => userMsg.toLowerCase().includes(k));
+    const reply = responses[key] || responses.default;
+
+    setTimeout(() => {
+      const botDiv = document.createElement('div');
+      botDiv.className = 'bot-msg';
+      botDiv.style = "margin: 8px 0;";
+      botDiv.innerHTML = <span style="background: #ffe0b2; padding: 8px 12px; border-radius: 12px; display: inline-block;">${reply}</span>;
+      chat.appendChild(botDiv);
+      chat.scrollTop = chat.scrollHeight;
+    }, 500);
+
+    input.value = '';
+    chat.scrollTop = chat.scrollHeight;
+  }
+</script>
+
+  
+
+</body>
+</html>

@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>e-ठेला | Dashboard</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+Bhai+2:wght@700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      background: #fff8f0 url('https://www.transparenttextures.com/patterns/arabesque.png');
+      font-family: 'Poppins', 'Baloo Bhai 2', cursive, sans-serif;
+    }
+    .rajasthan-banner {
+      background: linear-gradient(90deg, #ff9800 0%, #e65100 100%);
+      color: #fff;
+      font-family: 'Baloo Bhai 2', cursive;
+      font-size: 2rem;
+      letter-spacing: 2px;
+      text-align: center;
+      padding: 1rem 0;
+      box-shadow: 0 4px 12px rgba(230,81,0,0.15);
+      border-bottom: 4px solid #ffd54f;
+      background-image: url('https://img.icons8.com/color/48/000000/camel--v2.png');
+      background-repeat: no-repeat;
+      background-position: 1rem center;
+    }
+    .rajasthan-banner img {
+      height: 2.5rem;
+      vertical-align: middle;
+      margin: 0 1rem;
+    }
+    .navbar {
+      background: #ffd54f !important;
+    }
+    .navbar-brand {
+      font-family: 'Baloo Bhai 2', cursive;
+      color: #e65100 !important;
+      font-size: 1.5rem;
+    }
+    .card {
+      border: none;
+      box-shadow: 0 4px 24px rgba(255,152,0,0.08);
+    }
+    .btn-primary, .btn-success {
+      background: linear-gradient(90deg, #ff9800 0%, #e65100 100%);
+      border: none;
+    }
+    .btn-primary:hover, .btn-success:hover {
+      background: linear-gradient(90deg, #e65100 0%, #ff9800 100%);
+    }
+
+    .rajasthan-banner {
+ 
+      color: #333333;
+
+    }
+  </style>
+</head>
+<body>
+  <div class="rajasthan-banner">
+   <img src="https://unpkg.com/openmoji@14.0.0/color/svg/1F42A.svg" alt="Camel Icon">
+  Welcome to Rajasthan’s e-ठेला!
+   <img src="https://unpkg.com/openmoji@14.0.0/color/svg/1F42A.svg" alt="Camel Icon">
+</div>
+
+
+  <nav class="navbar navbar-expand-lg navbar-light">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="#">e-ठेला</a>
+      <div class="d-flex">
+        <a href="index.html" class="btn btn-outline-secondary">Logout</a>
+        <a href="marketplace.html" class="btn btn-success me-2">Marketplace</a>
+        <a href="vendors-map.html" class="btn btn-warning me-2">Vendors Map</a>
+      </div>
+    </div>
+  </nav>
+  <div class="container mt-5">
+    <div class="row justify-content-center">
+      <div class="col-md-8">
+        <div class="card text-center">
+          <div class="card-body" id="profileCard">
+            <h1 class="card-title display-5">Loading...</h1>
+          </div>
+        </div>
+        <div id="managementSection" class="mt-4"></div>
+        <div class="mt-3 text-center">
+          <a href="marketplace.html" class="btn btn-success">Go to Marketplace</a>
+        </div>
+        <div id="reviewsSection" class="mt-4"></div>
+      </div>
+    </div>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    const token = localStorage.getItem('token');
+    if (!token) {
+      window.location.href = 'login.html';
+    }
+    let userRole = null;
+    let userId = null;
+    document.addEventListener('DOMContentLoaded', async function() {
+      try {
+        const res = await fetch('http://localhost:5000/profile', {
+          headers: { 'Authorization': 'Bearer ' + token }
+        });
+        const data = await res.json();
+        if (res.ok) {
+          userRole = data.user.role;
+          userId = data.user._id;
+          const card = document.getElementById('profileCard');
+          card.innerHTML = `
+            <h1 class="card-title display-5">Welcome, ${data.user.fullName}!</h1>
+            <p class="card-text lead">Role: <strong>${data.user.role.replace('_', ' ')}</strong></p>
+            <p class="card-text">Phone: ${data.user.phone}</p>
+            <p class="card-text">Average Rating: <span class="fw-bold">${data.avgRating ?? 'N/A'}</span> (${data.reviewCount} reviews)</p>
+          `;
+          renderManagementSection();
+          loadMyReviews();
+        } else {
+          alert(data.message || 'Failed to load profile');
+        }
+      } catch (err) {
+        alert('Server error');
+      }
+    });
+
+    async function renderManagementSection() {
+      const section = document.getElementById('managementSection');
+      if (userRole === 'SUPPLIER') {
+        section.innerHTML = `
+          <h3>Manage Your Products</h3>
+          <form id="productForm" class="row g-3 mb-3">
+            <div class="col-md-4"><input type="text" class="form-control" id="prodName" placeholder="Name" required></div>
+            <div class="col-md-2"><input type="number" class="form-control" id="prodPrice" placeholder="Price per kg" required></div>
+            <div class="col-md-2"><input type="text" class="form-control" id="prodUnit" placeholder="Unit" required></div>
+            <div class="col-md-4"><input type="text" class="form-control" id="prodImage" placeholder="Image URL"></div>
+            <div class="col-12"><button type="submit" class="btn btn-primary w-100">Add Product</button></div>
+          </form>
+          <table class="table table-bordered" id="productsTable">
+            <thead><tr><th>Name</th><th>Price</th><th>Unit</th><th>Image</th><th>Actions</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        `;
+        document.getElementById('productForm').onsubmit = addProduct;
+        loadProducts();
+      } else if (userRole === 'STREET_VENDOR') {
+        section.innerHTML = `
+          <h3>Manage Your Listings</h3>
+          <form id="listingForm" class="row g-3 mb-3">
+            <div class="col-md-4"><input type="text" class="form-control" id="listTitle" placeholder="Title" required></div>
+            <div class="col-md-4"><input type="number" class="form-control" id="listPrice" placeholder="Price per kg" required></div>
+            <div class="col-md-4"><input type="text" class="form-control" id="listImage" placeholder="Image URL"></div>
+            <div class="col-12"><input type="text" class="form-control" id="listDesc" placeholder="Description"></div>
+            <div class="col-12"><button type="submit" class="btn btn-primary w-100">Add Listing</button></div>
+          </form>
+          <table class="table table-bordered" id="listingsTable">
+            <thead><tr><th>Title</th><th>Price</th><th>Image</th><th>Description</th><th>Actions</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        `;
+        document.getElementById('listingForm').onsubmit = addListing;
+        loadListings();
+      } else {
+        section.innerHTML = `<div class="alert alert-info">You are logged in as a customer. Marketplace browsing coming soon!</div>`;
+      }
+    }
+
+    // Supplier Product CRUD
+    let editingProductId = null;
+    async function loadProducts() {
+      const res = await fetch('http://localhost:5000/products/mine', { headers: { 'Authorization': 'Bearer ' + token } });
+      const products = await res.json();
+      const tbody = document.querySelector('#productsTable tbody');
+      tbody.innerHTML = '';
+      products.forEach(prod => {
+        tbody.innerHTML += `
+          <tr>
+            <td>${prod.name}</td>
+            <td>${prod.price}</td>
+            <td>${prod.unit}</td>
+            <td>${prod.image ? `<img src="${prod.image}" width="40">` : ''}</td>
+            <td>
+              <button class="btn btn-sm btn-warning" onclick="editProduct('${prod._id}', '${prod.name}', '${prod.price}', '${prod.unit}', '${prod.image || ''}')">Edit</button>
+              <button class="btn btn-sm btn-danger" onclick="deleteProduct('${prod._id}')">Delete</button>
+            </td>
+          </tr>
+        `;
+      });
+    }
+    async function addProduct(e) {
+      e.preventDefault();
+      const name = document.getElementById('prodName').value;
+      const price = document.getElementById('prodPrice').value;
+      const unit = document.getElementById('prodUnit').value;
+      const image = document.getElementById('prodImage').value;
+      if (editingProductId) {
+        // Edit mode
+        const res = await fetch(`http://localhost:5000/products/${editingProductId}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+          body: JSON.stringify({ name, price, unit, image })
+        });
+        if (res.ok) {
+          editingProductId = null;
+          document.getElementById('productForm').reset();
+          document.querySelector('#productForm button[type=submit]').innerText = 'Add Product';
+          loadProducts();
+        } else {
+          alert('Failed to update product');
+        }
+      } else {
+        // Add mode
+        const res = await fetch('http://localhost:5000/products', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+          body: JSON.stringify({ name, price, unit, image })
+        });
+        if (res.ok) {
+          document.getElementById('productForm').reset();
+          loadProducts();
+        } else {
+          alert('Failed to add product');
+        }
+      }
+    }
+    window.deleteProduct = async function(id) {
+      if (!confirm('Delete this product?')) return;
+      const res = await fetch(`http://localhost:5000/products/${id}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': 'Bearer ' + token }
+      });
+      if (res.ok) loadProducts();
+      else alert('Failed to delete');
+    }
+    window.editProduct = function(id, name, price, unit, image) {
+      editingProductId = id;
+      document.getElementById('prodName').value = name;
+      document.getElementById('prodPrice').value = price;
+      document.getElementById('prodUnit').value = unit;
+      document.getElementById('prodImage').value = image;
+      document.querySelector('#productForm button[type=submit]').innerText = 'Update Product';
+    }
+
+    // Vendor Listing CRUD
+    let editingListingId = null;
+    async function loadListings() {
+      const res = await fetch('http://localhost:5000/listings/mine', { headers: { 'Authorization': 'Bearer ' + token } });
+      const listings = await res.json();
+      const tbody = document.querySelector('#listingsTable tbody');
+      tbody.innerHTML = '';
+      listings.forEach(list => {
+        tbody.innerHTML += `
+          <tr>
+            <td>${list.title}</td>
+            <td>${list.price}</td>
+            <td>${list.image ? `<img src="${list.image}" width="40">` : ''}</td>
+            <td>${list.description || ''}</td>
+            <td>
+              <button class="btn btn-sm btn-warning" onclick="editListing('${list._id}', '${list.title}', '${list.price}', '${list.image || ''}', '${list.description || ''}')">Edit</button>
+              <button class="btn btn-sm btn-danger" onclick="deleteListing('${list._id}')">Delete</button>
+            </td>
+          </tr>
+        `;
+      });
+    }
+    async function addListing(e) {
+      e.preventDefault();
+      const title = document.getElementById('listTitle').value;
+      const price = document.getElementById('listPrice').value;
+      const image = document.getElementById('listImage').value;
+      const description = document.getElementById('listDesc').value;
+      if (editingListingId) {
+        // Edit mode
+        const res = await fetch(`http://localhost:5000/listings/${editingListingId}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+          body: JSON.stringify({ title, price, image, description })
+        });
+        if (res.ok) {
+          editingListingId = null;
+          document.getElementById('listingForm').reset();
+          document.querySelector('#listingForm button[type=submit]').innerText = 'Add Listing';
+          loadListings();
+        } else {
+          alert('Failed to update listing');
+        }
+      } else {
+        // Add mode
+        const res = await fetch('http://localhost:5000/listings', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+          body: JSON.stringify({ title, price, image, description })
+        });
+        if (res.ok) {
+          document.getElementById('listingForm').reset();
+          loadListings();
+        } else {
+          alert('Failed to add listing');
+        }
+      }
+    }
+    window.deleteListing = async function(id) {
+      if (!confirm('Delete this listing?')) return;
+      const res = await fetch(`http://localhost:5000/listings/${id}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': 'Bearer ' + token }
+      });
+      if (res.ok) loadListings();
+      else alert('Failed to delete');
+    }
+    window.editListing = function(id, title, price, image, description) {
+      editingListingId = id;
+      document.getElementById('listTitle').value = title;
+      document.getElementById('listPrice').value = price;
+      document.getElementById('listImage').value = image;
+      document.getElementById('listDesc').value = description;
+      document.querySelector('#listingForm button[type=submit]').innerText = 'Update Listing';
+    }
+
+    async function loadMyReviews() {
+      const res = await fetch(`http://localhost:5000/reviews/${userId}`);
+      const reviews = await res.json();
+      const section = document.getElementById('reviewsSection');
+      if (reviews.length) {
+        section.innerHTML = `
+          <div class="card mt-4">
+            <div class="card-header"><strong>Received Reviews</strong></div>
+            <ul class="list-group list-group-flush">
+              ${reviews.map(r => `
+                <li class="list-group-item">
+                  <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                      <strong>${r.authorId?.fullName || 'User'}</strong> <span class="badge bg-secondary">${r.authorId?.role || ''}</span>
+                    </div>
+                    <div>${'★'.repeat(r.rating)}${'☆'.repeat(5 - r.rating)}</div>
+                  </div>
+                  <div>${r.comment || ''}</div>
+                  <div class="text-muted small">${new Date(r.createdAt).toLocaleString()}</div>
+                </li>
+              `).join('')}
+            </ul>
+          </div>
+        `;
+      } else {
+        section.innerHTML = '';
+      }
+    }
+  </script>
+</body>
+</html> 
