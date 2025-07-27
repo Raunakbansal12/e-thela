@@ -26,6 +26,11 @@
       background-repeat: no-repeat;
       background-position: 1rem center;
     }
+    .rajasthan-banner img {
+      height: 2.5rem;
+      vertical-align: middle;
+      margin: 0 1rem;
+    }
     .navbar {
       background: #ffd54f !important;
     }
@@ -45,14 +50,22 @@
     .btn-primary:hover, .btn-success:hover {
       background: linear-gradient(90deg, #e65100 0%, #ff9800 100%);
     }
+
+    .rajasthan-banner {
+ 
+      color: #333333;
+
+    }
   </style>
 </head>
 <body>
   <div class="rajasthan-banner">
-    <img src="https://img.icons8.com/color/48/000000/camel--v2.png" style="height:2.5rem;vertical-align:middle;margin-right:1rem;">
-    Welcome to Rajasthan’s e-ठेला!
-    <img src="https://img.icons8.com/color/48/000000/camel--v2.png" style="height:2.5rem;vertical-align:middle;margin-left:1rem;">
-  </div>
+   <img src="https://unpkg.com/openmoji@14.0.0/color/svg/1F42A.svg" alt="Camel Icon">
+  Welcome to Rajasthan’s e-ठेला!
+   <img src="https://unpkg.com/openmoji@14.0.0/color/svg/1F42A.svg" alt="Camel Icon">
+</div>
+
+
   <nav class="navbar navbar-expand-lg navbar-light">
     <div class="container-fluid">
       <a class="navbar-brand" href="#">e-ठेला</a>
@@ -120,7 +133,7 @@
           <h3>Manage Your Products</h3>
           <form id="productForm" class="row g-3 mb-3">
             <div class="col-md-4"><input type="text" class="form-control" id="prodName" placeholder="Name" required></div>
-            <div class="col-md-2"><input type="number" class="form-control" id="prodPrice" placeholder="Price" required></div>
+            <div class="col-md-2"><input type="number" class="form-control" id="prodPrice" placeholder="Price per kg" required></div>
             <div class="col-md-2"><input type="text" class="form-control" id="prodUnit" placeholder="Unit" required></div>
             <div class="col-md-4"><input type="text" class="form-control" id="prodImage" placeholder="Image URL"></div>
             <div class="col-12"><button type="submit" class="btn btn-primary w-100">Add Product</button></div>
@@ -137,7 +150,7 @@
           <h3>Manage Your Listings</h3>
           <form id="listingForm" class="row g-3 mb-3">
             <div class="col-md-4"><input type="text" class="form-control" id="listTitle" placeholder="Title" required></div>
-            <div class="col-md-4"><input type="number" class="form-control" id="listPrice" placeholder="Price" required></div>
+            <div class="col-md-4"><input type="number" class="form-control" id="listPrice" placeholder="Price per kg" required></div>
             <div class="col-md-4"><input type="text" class="form-control" id="listImage" placeholder="Image URL"></div>
             <div class="col-12"><input type="text" class="form-control" id="listDesc" placeholder="Description"></div>
             <div class="col-12"><button type="submit" class="btn btn-primary w-100">Add Listing</button></div>
