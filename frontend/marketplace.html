@@ -1,3 +1,4 @@
+<!-- Voice-enabled + Language-enabled Marketplace Page with Full Vendor Details -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -21,37 +22,16 @@
   </nav>
   <div class="container mt-4">
     <div class="d-flex justify-content-end mb-3 gap-2">
-      <button class="btn btn-outline-secondary" onclick="alert('Language feature coming soon!')"><i class="bi bi-translate"></i> Toggle Language</button>
-      <button class="btn btn-outline-secondary" onclick="alert('Voice interface coming soon!')"><i class="bi bi-mic"></i> Activate Voice Interface</button>
+      <button class="btn btn-outline-secondary" onclick="toggleLanguage()">
+        <i class="bi bi-translate"></i> <span id="langToggle">Switch to Hindi</span>
+      </button>
+      <button class="btn btn-outline-secondary" onclick="startVoiceSearch()">
+        <i class="bi bi-mic"></i> Voice Search
+      </button>
     </div>
     <h2 class="mb-4" id="marketTitle">Marketplace</h2>
+    <input type="text" id="searchInput" class="form-control mb-3" placeholder="Search product by name...">
     <div class="row" id="marketFeed"></div>
-  </div>
-
-  <!-- Review Modal -->
-  <div class="modal fade" id="reviewModal" tabindex="-1" aria-labelledby="reviewModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="reviewModalLabel">Rate & Review</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <form id="reviewForm">
-            <input type="hidden" id="reviewSubjectId">
-            <div class="mb-3">
-              <label class="form-label">Rating</label>
-              <div id="starRating" class="mb-2"></div>
-            </div>
-            <div class="mb-3">
-              <label for="reviewComment" class="form-label">Comment</label>
-              <textarea class="form-control" id="reviewComment" rows="3"></textarea>
-            </div>
-            <button type="submit" class="btn btn-primary w-100">Submit Review</button>
-          </form>
-        </div>
-      </div>
-    </div>
   </div>
 
   <!-- Reviews List Modal -->
@@ -62,8 +42,7 @@
           <h5 class="modal-title" id="reviewsListModalLabel">User Reviews</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
-        <div class="modal-body" id="reviewsListBody">
-        </div>
+        <div class="modal-body" id="reviewsListBody"></div>
       </div>
     </div>
   </div>
@@ -74,9 +53,10 @@
     if (!token) window.location.href = 'login.html';
     let userRole = null;
     let myUserId = null;
-    let reviewRating = 0;
+    let allItems = [];
+    let currentLanguage = 'en';
+
     document.addEventListener('DOMContentLoaded', async function() {
-      // Get user role
       try {
         const res = await fetch('http://localhost:5000/profile', {
           headers: { 'Authorization': 'Bearer ' + token }
@@ -85,109 +65,109 @@
         if (res.ok) {
           userRole = data.user.role;
           myUserId = data.user._id;
-          if (userRole === 'STREET_VENDOR') {
-            document.getElementById('marketTitle').innerText = 'Raw Materials Marketplace';
-            loadProducts();
-          } else {
-            document.getElementById('marketTitle').innerText = 'Street Vendor Listings';
-            loadListings();
-          }
-        } else {
-          alert('Failed to load user profile');
+          document.getElementById('marketTitle').innerText = userRole === 'STREET_VENDOR' ? 'Raw Materials Marketplace' : 'Street Vendor Listings';
+          userRole === 'STREET_VENDOR' ? loadProducts() : loadListings();
         }
       } catch (err) {
         alert('Server error');
       }
     });
+
     async function loadProducts() {
       const res = await fetch('http://localhost:5000/products');
       const products = await res.json();
-      const feed = document.getElementById('marketFeed');
-      feed.innerHTML = '';
-      products.forEach(prod => {
-        feed.innerHTML += `
-          <div class="col-md-4 mb-4">
-            <div class="card h-100">
-              ${prod.image ? `<img src=\"${prod.image}\" class=\"card-img-top\" style=\"max-height:180px;object-fit:cover;\">` : ''}
-              <div class="card-body">
-                <h5 class="card-title">${prod.name}</h5>
-                <p class="card-text">Price: ₹${prod.price} per ${prod.unit}</p>
-                <p class="card-text">Supplier: ${prod.supplierId?.fullName || 'N/A'}</p>
-                <p class="card-text small text-muted">Phone: ${prod.supplierId?.phone || ''}</p>
-                ${prod.supplierId?.phone ? `<button class=\"btn btn-outline-primary w-100 mt-2\" onclick=\"alert('Connecting you to the supplier privately...')\">Call Supplier</button>` : ''}
-                ${prod.supplierId?._id && prod.supplierId._id !== myUserId ? `<button class=\"btn btn-outline-success w-100 mt-2\" onclick=\"openReviewModal('${prod.supplierId._id}')\">Rate & Review</button>` : ''}
-                ${prod.supplierId?._id ? `<button class=\"btn btn-link w-100 mt-2\" onclick=\"openReviewsListModal('${prod.supplierId._id}', '${prod.supplierId.fullName}')\">View Reviews</button>` : ''}
-              </div>
-            </div>
-          </div>
-        `;
-      });
+      allItems = products;
+      renderFeed(products);
     }
+
     async function loadListings() {
       const res = await fetch('http://localhost:5000/listings');
       const listings = await res.json();
+      allItems = listings;
+      renderFeed(listings);
+    }
+
+    function renderFeed(items) {
       const feed = document.getElementById('marketFeed');
       feed.innerHTML = '';
-      listings.forEach(list => {
+      items.forEach(item => {
+        const title = item.name || item.title;
+        const user = item.vendorId || item.supplierId;
+        const image = item.image ? `<img src="${item.image}" class="card-img-top" style="max-height:180px;object-fit:cover;">` : '';
         feed.innerHTML += `
           <div class="col-md-4 mb-4">
             <div class="card h-100">
-              ${list.image ? `<img src=\"${list.image}\" class=\"card-img-top\" style=\"max-height:180px;object-fit:cover;\">` : ''}
+              ${image}
               <div class="card-body">
-                <h5 class="card-title">${list.title}</h5>
-                <p class="card-text">Price: ₹${list.price}</p>
-                <p class="card-text">Vendor: ${list.vendorId?.fullName || 'N/A'}</p>
-                <p class="card-text small text-muted">Phone: ${list.vendorId?.phone || ''}</p>
-                <p class="card-text">${list.description || ''}</p>
-                ${list.vendorId?._id && list.vendorId._id !== myUserId ? `<button class=\"btn btn-outline-success w-100 mt-2\" onclick=\"openReviewModal('${list.vendorId._id}')\">Rate & Review</button>` : ''}
-                ${list.vendorId?._id ? `<button class=\"btn btn-link w-100 mt-2\" onclick=\"openReviewsListModal('${list.vendorId._id}', '${list.vendorId.fullName}')\">View Reviews</button>` : ''}
-              </div>
+                <h5 class="card-title">${translateText(title)}</h5>
+                <p class="card-text">${translateText('Price')}: ₹${item.price} ${item.unit ? translateText('per') + ' ' + item.unit : ''}</p>
+                <p class="card-text">${translateText(user ? (item.vendorId ? 'Vendor' : 'Supplier') : 'User')}: ${user?.fullName || 'N/A'}</p>
+                <p class="card-text small text-muted">${translateText('Phone')}: ${user?.phone || 'Not Available'}</p>
+                ${user?.phone ? `<button class="btn btn-outline-primary w-100 mt-2" onclick="alert('Connecting to ${user.fullName} at ${user.phone}...')">Call Supplier</button>` : ''}
+${user?._id && user._id !== myUserId ? `
+  <button class="btn btn-outline-success w-100 mt-2" onclick="openReviewModal('${user._id}')">Give Rating & Review</button>
+  <button class="btn btn-outline-success w-100 mt-2" onclick="openReviewsListModal('${user._id}', '${user.fullName}')">View Reviews</button>
+` : ''}
+
+
+             </div>
             </div>
-          </div>
-        `;
+          </div>`;
       });
     }
 
-    // Review Modal Logic
-    window.openReviewModal = function(subjectId) {
-      reviewRating = 0;
-      document.getElementById('reviewSubjectId').value = subjectId;
-      document.getElementById('reviewComment').value = '';
-      renderStarRating();
-      var reviewModal = new bootstrap.Modal(document.getElementById('reviewModal'));
-      reviewModal.show();
-    }
-    function renderStarRating() {
-      const starDiv = document.getElementById('starRating');
-      starDiv.innerHTML = '';
-      for (let i = 1; i <= 5; i++) {
-        starDiv.innerHTML += `<i class="bi bi-star${i <= reviewRating ? '-fill' : ''} fs-3" style="cursor:pointer;color:${i <= reviewRating ? '#ffc107' : '#ccc'}" onclick="setReviewRating(${i})"></i>`;
+    function startVoiceSearch() {
+      if (!('webkitSpeechRecognition' in window)) {
+        alert('Voice recognition not supported in this browser.');
+        return;
       }
-    }
-    window.setReviewRating = function(r) {
-      reviewRating = r;
-      renderStarRating();
-    }
-    document.getElementById('reviewForm').onsubmit = async function(e) {
-      e.preventDefault();
-      const subjectId = document.getElementById('reviewSubjectId').value;
-      const comment = document.getElementById('reviewComment').value;
-      if (!reviewRating) return alert('Please select a rating.');
-      const res = await fetch('http://localhost:5000/reviews', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
-        body: JSON.stringify({ subjectId, rating: reviewRating, comment })
-      });
-      if (res.ok) {
-        alert('Review submitted!');
-        bootstrap.Modal.getInstance(document.getElementById('reviewModal')).hide();
-      } else {
-        alert('Failed to submit review');
-      }
+      const recognition = new webkitSpeechRecognition();
+      recognition.lang = currentLanguage === 'hi' ? 'hi-IN' : 'en-IN';
+      recognition.start();
+      recognition.onresult = function(event) {
+        const spokenText = event.results[0][0].transcript.toLowerCase();
+        document.getElementById('searchInput').value = spokenText;
+        filterItems(spokenText);
+      };
+      recognition.onerror = function() {
+        alert('Could not recognize speech. Please try again.');
+      };
     }
 
-    // Reviews List Modal Logic
-    window.openReviewsListModal = async function(userId, userName) {
+    document.getElementById('searchInput').addEventListener('input', function() {
+      filterItems(this.value);
+    });
+
+    function filterItems(query) {
+      const filtered = allItems.filter(item => {
+        const name = (item.name || item.title || '').toLowerCase();
+        return name.includes(query.toLowerCase());
+      });
+      renderFeed(filtered);
+    }
+
+    function toggleLanguage() {
+      currentLanguage = currentLanguage === 'en' ? 'hi' : 'en';
+      document.getElementById('langToggle').innerText = currentLanguage === 'en' ? 'Switch to Hindi' : 'English को चुनें';
+      renderFeed(allItems);
+    }
+
+    function translateText(text) {
+      if (currentLanguage === 'en') return text;
+      const dict = {
+        'Marketplace': 'बाजार',
+        'Raw Materials Marketplace': 'कच्चे माल की बाजार',
+        'Street Vendor Listings': 'स्ट्रीट वेंडर की सूची',
+        'Price': 'मूल्य',
+        'per': 'प्रति',
+        'Vendor': 'विक्रेता',
+        'Supplier': 'आपूर्तिकर्ता',
+        'Phone': 'फोन'
+      };
+      return dict[text] || text;
+    }
+
+    async function openReviewsListModal(userId, userName) {
       document.getElementById('reviewsListModalLabel').innerText = `Reviews for ${userName}`;
       const res = await fetch(`http://localhost:5000/reviews/${userId}`);
       const reviews = await res.json();
@@ -204,14 +184,12 @@
               </div>
               <div>${r.comment || ''}</div>
               <div class="text-muted small">${new Date(r.createdAt).toLocaleString()}</div>
-            </li>
-          `).join('')}</ul>`;
+            </li>`).join('')}</ul>`;
       } else {
         body.innerHTML = '<div class="alert alert-info">No reviews yet.</div>';
       }
-      var reviewsModal = new bootstrap.Modal(document.getElementById('reviewsListModal'));
-      reviewsModal.show();
+      new bootstrap.Modal(document.getElementById('reviewsListModal')).show();
     }
   </script>
 </body>
-</html> 
+</html>
